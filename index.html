@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>ML & E. coli mutants </title>
+    <link href="http://www.niser.ac.in/~smishra/css/smlab.css" rel="stylesheet" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <style>
+        table, th, td {
+                border: 1px solid black;
+                border-collapse: collapse;
+            }
+        th, td {
+          padding: 15px;
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <div class="container">
+        <h2> Classifying <i>Escherichia coli </i> mutants from phase contrast images using machine learning</h2>
+        <p>
+            <a href="mailto:konthalapalli.hradini@niser.ac.in">Konthalapalli Hradini</a><br>
+            Sanaa Qahera Khan
+        </p>
+        <hr/>
+        <h3>Motivation</h3>
+        <p>
+            Manually analysing data can be an arduous process that eats into the time available to carry out experiments. For this reason, we hope to use machine learning to automate the analysis of mutant 
+            <em>Escherichia coli </em> (<em>E. coli</em>) cells. Our dataset consists of phase contrast images of FtsZ mutant <em> E. coli </em>. FtsZ is an important bacterial cytoskeletal protein that is involved in cell division and in 
+            driving cell wall metabolism<sup>[<a href="#ref-8">1</a>]</sup>. The FtsZ mutants are extremely elongated and show various shape abnormalities, as well as differences in curvature. By classifying images based on shape, important 
+            conclusions can be drawn about cell wall composition and the nature of cytoskeletal mutation. This information can help direct future experiments. 
+        </p>
+        <p>
+            The aim of our project is to classify cells from phase contrast images based on shape features. For this purpose, machine learning can be useful in two places:
+            <ul>
+                <li>
+                To segment the images and to separate out individual cells even when they are closely clumped together.</li>
+                <li> 
+                    To classify cells based on shape 
+                </li>
+            </ul>
+        </p>
+        <hr>
+
+        <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQkN5Xcblee6xpDwz8wIZV4PskgvwycapL4YnpHI0Usg57JQ7dkSljfo1_AN6nAuCeB6gxTZeZZueqs/embed?start=false&loop=false&delayms=3000" frameborder="0" width="760" height="457" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+        <hr>
+        <h3>Progress</h3>
+        <p>
+            <ul>
+                <li> Convolutional neural networks are data intensive, so our first task was to expand our dataset of 30 images belonging to FtsZ mutants in order to perform segmentation. We did this by including images of other <em> E. coli </em> mutant cells from the lab into our segmentation dataset. It took us a few weeks to get all the images but we managed to acquire around 900 images in total. </li>
+
+                <li> The next few weeks were spent writing scripts to pre-process the data. This included adjusting the dimensions of the images to be (512,512) pixels. We did this by slicing each image to give multiple images. This allowed us to further increase our dataset and avoid loss of image quality. Our original images were of the size (2048,2048) and (1024,1024) so we got 4 to 16 new images per original image. </li>
+
+                <li> We also wrote a script in Fiji to generate the masks for the images. At this time we began annotating our data while trying to understand more about CNNs.</li>
+
+                <li> After learning more about using CNNs for image segmentation, we decided to use the U-Net architecture for our segmentation problem. </li>
+
+                <li> Given our limited experience with machine learning tools like tensorflow and keras, we thought it would be best to modify a pre-existing code to fit our problem. We found two sources, a github repository by <a href="https://github.com/zhixuhao/unet" target="_blank">zhixuhao</a> and a <a href="https://keras.io/examples/vision/oxford_pets_image_segmentation/" target="_blank"> keras tutorial</a> on image segmentation using U-NET like architecture. We have, so far experimented with code from the second source.</li>
+
+                <li> Before we could proceed, we realised that there was an error in our segmentation masks. The masks needed to be modified to have three labels, corresponding to background, cell interior and cell boundary instead of one label for each cell. </li>
+
+                <li> We ran the code with 104 images for 15 epochs. The loss was sparse categorical cross entropy and the optimiser was rmsprop. This model could not successfully perform segmentation.</li>
+
+                <li> Next, to check where the error in the model could be, we used 1000 copies of the same image as the training data. This produced better results but still did not succeed in segmenting the cells. </li> 
+
+                <li> We also tried running the same 1000 images with a different optimiser (adam) but did not get any results </li>
+
+                <li> Since running the aforementioned models, we have increased the amount of data we have ready by annotating more images and by performing data augmentation on the available images. </li>
+            </ul>
+        </p>
+        <hr>
+        
+        <h3>Results and Modifications</h3>
+        <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vRNZnlNvuWwWMlb8A84XbrMBjloBTffBguyAMr2mu35z5z5Oo9x9giS4S4XLO8qbFQNYRmFn_yEBdGk/embed?start=false&loop=false&delayms=3000" frameborder="0" width="760" height="457" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+        
+        <hr>        
+        <h3>Algorithm and Datasets</h3>
+        
+        <p>
+            The dataset consists of phase contrast microscopy images from Dr Ramanujam Srinivasan's Lab at SBS , NISER. There are 28 images with ~ 12 cells per image. Here is a slide set where we highlight the variation in the cells and try different segmentation methods to get cell boundaries.
+        </p>
+    
+
+       <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vSvoLuGWfFMxtjRhGPOZMoos3zbWYXyGKBuPZUHUrQBEhZLuIvJwSIrEc0C27_TOeHYaBQXfyeytlHm/embed?start=true&loop=true&delayms=5000" frameborder="0" width="760" height="457" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+        
+
+        <p>
+            As mentioned previously, our project can be divided into two steps; cell segmentation and object classification. 
+        </p>
+
+        <p>
+            For the segmentation step, there are two approaches we could adopt.
+        </p>
+
+        <p>
+            One would be to use traditional image analysis to segment cells. However, this can prove to be difficult since our data contains many closely clumped cells.
+        </p>
+        <p>
+            If purely analytical methods fail to separate cells, then we propose to use convolutional neural networks (CNN). CNN has previously
+            been used in the segmentation of cryo-stage microscope images <sup>[<a href="#ref-1">2</a>]</sup>.  Another study used deep learning to perform cell segmentation on a diverse 
+            set of images <sup>[<a href="#ref-2">3</a>]</sup>. The cells in the image were from multiple cell lines so their appearances were 
+            quite different from each other. The algorithm still succeeded in segmenting cells, even ones that were touching.  
+            Though these segmentation problems are not quite the same as our issue with clumped cells, we are certain that CNN could be a good algorithm to address the issue.  
+        </p>
+
+        <p>
+            Once segmentation is successful, the next stage in our project is the classification of cells. Through our survey of the literature, we have again found two ways this could be done.
+        </p>
+
+        <p>
+            The first way would be to use CNN to do object classification. In one of the papers we read, CNN has been used to identify cells undergoing mitosis.
+            A low rank matrix recovery model (LRMR) is used to identify regions containing mitosis events. Then, a hierarchical CNN is applied on these regions 
+            to classify them into one of four stages of mitosis. The dataset in this study is a timelapse of phase contrast images<sup>[<a href="#ref-3">4</a>]</sup>. 
+            CNN has also been used in regenerative medicine. In the latter case, CNN was used to identify cellular differentiation in cultured C2C12 cells<sup>[<a href="#ref-4">5</a>]</sup>. 
+            The algorithm was provided with phase contrast images of cells before and after differentiation as input.
+        </p>
+
+        <p>
+            The second approach comes from a paper where fibroblast cells were classified based on morphology<sup>[<a href="#ref-5">6</a>]</sup>. Here, the Adaboost algorithm was used. The algorithm was 
+            provided with shape based and appearance based feature of the cells, along with a set of weak classifiers. The output was a set of strong classifiers and 
+            associated weights that the algorithm uses to classify cells in the prediction phase.
+        </p>
+
+        <p>
+            We are more inclined to use CNN at this stage, since it has proved to be capable of solving a diverse range of image analysis and object classification problems <sup>[<a href="#ref-6">7</a>], [<a href="#ref-7">8</a>]</sup>.
+        </p> 
+       
+        <hr/>
+        <h3>Milestone Presentation</h3>
+        <p>
+            We spent our first week talking to Dr. Srini and PhD students from his lab to find out the biologically relevant shape classes. From that conversation we were able to list criteria that we might use for classification. 
+        </p>
+        <ul>
+        <li>Branched vs. Unbranched cells</li>
+        <li>Length of the cells</li>
+        <li>Long bent vs. long unbent cells</li>
+        <li>Constricted cells</li>
+        </ul>
+
+        <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vSaAy4TMiUnPNKVMrs8DhJNsvY2W43FtcrPAsfVAKlaD1y4cgdV16uzEe5DO5g8U5ddEGLa3fHWbawD/embed?start=false&loop=true&delayms=3000" frameborder="0" width="760" height="457" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+
+        <p>
+            We also found out more about the methods they currently use to segment cells which is a combination of imperfect analytical methods and manual segmentation. This supports our decision to treat the segmentation of cells to be a unique and non-trivial problem in its own right.
+        </p>
+        <p>
+            The second task we focused on was understanding more about CNN. We went over introductory material and looked at tutorials that introduced us to important libraries. As a result of that, we have decided to use Tensorflow with keras as Api. Using Tensorflow we constructed some simple CNNs that use MNIST data. This gave us an idea about the kind of formatting and preprocessing we must perform on our own dataset.
+        </p>
+
+        <p>
+            We have around 900 images for our segmentation problem. However, they were given to us in various formats and sizes. We have converted them into a single format for further processing.
+            We have automated part of the process of identifying cell boundaries. We have written a macro that performs thresholding, converts the thresholded image into a binary mask and then identifies the cell boundaries. After this step, we will manually edit the boundaries of clumped cells. Then we will generate masks which will serve as the labels for our algorithm.
+
+        </p>
+
+
+        <table style ="width:100%">
+            <tr>
+                <th>
+                    Input image
+                </th>
+                <th>
+                    Thresholded image
+                </th>
+                <th>
+                    Labels
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <img style="display:block;" width="100%" height=auto src="input.jpg" alt="Input image">
+                </td>
+                <td>
+                    <img style="display:block;" width="100%" height=auto src="threshold.jpg" alt="Threshold image">
+                </td>
+                <td>
+                    <img style="display:block;" width="100%" height=auto src="label.jpg" alt="Ground truth image">
+
+                </td>
+            </tr>
+        </table>
+
+        <p>
+            We have also explored the possibility of using synthetic data generation and data augmentation to expand our dataset. For classification, especially, our dataset is quite small. Using synthetic data generation can hopefully solve this problem. In one of the papers we read, parametric models were used to synthetically generate bacterial shapes <sup>[<a href="#ref-9">9</a>]</sup>.
+
+            Our dataset for segmentation is much larger than the one we have for classification but we still hope to increase the training data by modifying (rotation, flipping etc) existing images.
+        </p>
+
+        <p>
+            As mentioned before, we will be using the U-Net architecture to solve our segmentation problem. This architecture won the EM (electron microscopy) segmentation challenge at ISBI 2012 and it has also proved to be very efficient at performing segmentation on phase contrast and DIC microscopy images <sup>[<a href="#ref-10">10</a>]</sup>. It builds on top of a fully convolutional network but there are no fully connected layers. Only the valid part of each convolution is used. 
+        </p>
+        <p>
+            There are several reasons we chose this architecture: 
+            <ul>
+                <li> 
+                    It is very efficient at separating out touching cells of the same type. To achieve this, a weighted loss is used. The background labels separating touching cells have a large weight in the loss function.
+                </li>
+                <li> 
+                    Managed to achieve very high accuracy with a relatively limited dataset. 
+                </li>
+
+            </ul>
+
+        </p>
+
+        <img width="100%" height=auto src="Unet.jpg" alt="U-Net architecture">
+
+        <hr>
+
+        <h3>References</h3>
+        <ol>
+            <li id="ref-8">
+                <cite>
+                    Harold P. Erickson, David E. Anderson, Masaki Osawa, FtsZ in Bacterial Cytokinesis: Cytoskeleton and Force Generator All in One, Microbiology and Molecular Biology Reviews, Volume 4, 2010, Pages 504-528,
+                    <a href="https://doi.org/10.1128/MMBR.00021-10">https://doi.org/10.1128/MMBR.00021-10</a>.
+                </cite>
+            </li>
+            <li id="ref-1">
+                <cite>
+                    Momoh Karmah Mbogba, Zeeshan Haider, S.M. Chapal Hossain, Daobin Huang, Kashan Memon, Fazil Panhwar, Zeling Lei, Gang Zhao,
+                    The application of convolution neural network based cell segmentation during cryopreservation,
+                    Cryobiology,
+                    Volume 85,
+                    2018,
+                    Pages 95-104,
+                    ISSN 0011-2240,
+                    <a href = "https://doi.org/10.1016/j.cryobiol.2018.09.003" target="_blank">https://doi.org/10.1016/j.cryobiol.2018.09.003</a>.
+                </cite>
+            </li>
+            <li id="ref-2">
+                <cite>
+                    Yousef Al-Kofahi1, Alla Zaltsman, Robert Graves, Will Marshall, Mirabela Rusu,
+                    A deep learning-based algorithm for 2-D cell segmentation in microscopy images,
+                    BMC Bioinformatics, Volume 19, 2018, 365,
+                    <a href="https://doi.org/10.1186/s12859-018-2375-z" target="_blank">https://doi.org/10.1186/s12859-018-2375-z</a>.
+                </cite>
+            </li>
+            <li id="ref-3">
+                <cite>
+                    Yunxiang Mao, Liang Han, Zhaozheng Yin,
+                    Cell mitosis event analysis in phase contrast microscopy images using deep learning,
+                    Medical Image Analysis,
+                    Volume 57,
+                    2019,
+                    Pages 32-43,
+                    ISSN 1361-8415,
+                    <a href="https://doi.org/10.1016/j.media.2019.06.011" target="_blank">https://doi.org/10.1016/j.media.2019.06.011</a>.
+                </cite>
+            </li>
+            
+            <li id="ref-4">
+                <cite>
+                    Hirohiko Niioka, Satoshi Asatani, Aina Yoshimura, Hironori Ohigashi, Seiichi Tagawa, Jun Miyake, Classification of C2C12 cells at differentiation by convolutional neural network of deep learning using phase contrast images, Human Cell, Volume 31, 2018, Pages 87–93, 
+                    <a href="https://doi.org/10.1007/s13577-017-0191-9" target="_blank">https://doi.org/10.1007/s13577-017-0191-9</a>.
+                </cite>
+            </li>
+            <li id="ref-5">
+                <cite>
+                    Diane H. Theriault, Matthew L. Walker, Joyce Y. Wong, Margrit Betke,
+                    Cell morphology classification and clutter mitigation in phase-contrast microscopy images using machine learning, Machine Vision and Applications, Volume 23, 2012, Pages 659–673, 
+                    <a href="https://doi.org/10.1007/s00138-011-0345-9" target="_blank">https://doi.org/10.1007/s00138-011-0345-9</a>.
+                </cite>
+            </li>
+            
+            <li id="ref-6">
+                <cite>
+                    Masayasu Toratani, Masamitsu Konno, Ayumu Asai, Jun Koseki, Koichi Kawamoto, Keisuke Tamari, Zhihao Li, Daisuke Sakai, Toshihiro Kudo, Taroh Satoh, Katsutoshi Sato, Daisuke Motooka, Daisuke Okuzaki, Yuichiro Doki, Masaki Mori, Kazuhiko Ogawa and Hideshi Ishii,
+                    A Convolutional Neural Network Uses Microscopic Images to Differentiate between Mouse and Human Cell Lines and Their Radioresistant Clones, 
+                    Cancer Research, Volume 78, 2018, Pages 6703-6707, 
+                    <a href="https://doi.org/10.1158/0008-5472.CAN-18-0653" target="_blank">https://doi.org/10.1158/0008-5472.CAN-18-0653</a>.
+                </cite>
+            </li>
+            <li id="ref-7">
+                <cite>
+                    Juan C. Caicedo, Jonathan Roth, Allen Goodman, Tim Becker, Kyle W. Karhohs, Matthieu Broisin, Csaba Molnar, Claire McQuin, Shantanu Singh, Fabian J. Theis, Anne E. Carpenter, Evaluation of Deep Learning Strategies for Nucleus Segmentation in Fluorescence Images, Cytometry, Volume 95, 2019, Pages 952-965, 
+                    <a href="https://doi.org/10.1002/cyto.a.23863" target="_blank">https://doi.org/10.1002/cyto.a.23863</a>
+                </cite>
+            </li>
+            <li id="ref-9">
+                <cite>
+                    A. Lehmussola, P. Ruusuvuori, J. Selinummi, T. Rajala, O. Yli-Harja, Synthetic Images of High-Throughput Microscopy for Validation of Image Analysis Methods, in Proceedings of the IEEE, Volume 96, 2008, Pages 1348-1360, <a href="https://doi.org/10.1109/JPROC.2008.925490" target="_blank">https://doi.org/10.1109/JPROC.2008.925490</a>
+                </cite>
+            </li>
+            <li id="ref-10">
+                <cite>
+                    O. Ronneberger, P.Fischer, T. Brox, U-Net: Convolutional Networks for Biomedical Image Segmentation, Medical Image Computing and Computer-Assisted Intervention, Volume 9351, 2015, Pages 234-241, <a href="https://doi.org/10.1007/978-3-319-24574-4_28">https://doi.org/10.1007/978-3-319-24574-4_28</a>
+
+                </cite>
+            </li>
+        </ol>
+        
+        <hr/>
+    </div>
+</body>
+
+</html>
